@@ -1,0 +1,91 @@
+#include <iostream>
+#include "user.h"
+
+using namespace std;
+
+enum PrimaryPrompt{LOGIN, REGISTER, EXIT, MAIN_PROMPT};
+enum subLoginPrompt{USER_VERIFICATION, LOGIN_MENU};
+enum loginMenuPrompt{LIST_CONTACT, ADD_CONTACT, LOGOUT, LOGIN_MENU_PROMPT};
+
+int main() {
+    PrimaryPrompt prompt = MAIN_PROMPT;
+    subLoginPrompt sub_login_prompt = USER_VERIFICATION;
+
+    //reset static variables to 0
+    User::resetId();
+
+    User user;
+    //test case
+    user = User("test", "123");
+    while (prompt != EXIT) {
+        switch (prompt) {
+            case MAIN_PROMPT:
+                cout << "Select an option: " << endl;
+                cout << "1. Login" << endl;
+                cout << "2. Register" << endl;
+                cout << "3. Exit" << endl;
+                int choice;
+                cin >> choice;
+                prompt = static_cast<PrimaryPrompt>(choice - 1);
+                break;
+            case LOGIN:{
+                // login is prompting entering name and phone number to confirmation
+                //cout << "Login selected." << endl;
+                loginMenuPrompt login_menu_prompt = LOGIN_MENU_PROMPT;
+                switch (sub_login_prompt){
+                    case USER_VERIFICATION:{
+                        string name, phone;
+                        cout << "Please enter name and phone number for Login." << endl;
+                        cout << "Name: "; cin >> name;
+                        cout << "Phone: "; cin >> phone;
+                        if ((user.getName() == name) & (phone == user.getPhone())){
+                            sub_login_prompt = LOGIN_MENU;
+                            user.setLoginState(1);
+                        }
+                        break;
+                    }
+                    case LOGIN_MENU:{
+                        switch(login_menu_prompt){
+                            case LOGIN_MENU_PROMPT:
+                                //TODO: Must check user login state
+                                cout << "Please select the following" << endl;
+                                cout << "1. List contact" << endl;
+                                cout << "2. Add contact" << endl;
+                                cout << "3. Logout" << endl;
+                                cin >> choice;
+                                sub_login_prompt = static_cast<subLoginPrompt>(choice - 1);
+                                break;
+                                break;
+                            case LIST_CONTACT:
+                                break;
+                            case ADD_CONTACT:
+                                break;
+                            case LOGOUT:
+                                prompt = MAIN_PROMPT;
+                                sub_login_prompt = USER_VERIFICATION;
+                                user.setLoginState(0);
+                                break;
+                        }
+                    }
+                }
+                break;
+            }
+            case REGISTER:{
+                // register ask for the user internal data, then immediately make the current user login
+                string name, phone;
+                cout << "Please enter name and phone number for registration." << endl;
+                cout << "Name: "; cin >> name;
+                cout << "Phone: "; cin >> phone;
+                user = User(name, phone);
+                //after register set the state to LOGIN for the other menu
+                prompt = LOGIN;
+                sub_login_prompt = LOGIN_MENU;
+                break;
+            }
+            case EXIT:
+                return 1;
+        }
+    }
+
+    return 0;
+}
