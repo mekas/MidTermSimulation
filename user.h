@@ -109,6 +109,39 @@ public:
         cout << endl;
     }
 
+    bool checkUserExist(string phone){
+        for(auto user: contact){
+            if(user.getPhone() == phone){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    User seekContact(string phone){
+        User foundUser;
+        for(auto user: contact){
+            if(user.getPhone() == phone){
+                foundUser = user;
+                return foundUser;
+            }
+        }
+        //in reality we won't expect this to be executed
+        return User();
+    }
+
+    void updateContact(int id, User other){
+        for(auto &user: contact){
+            if(user.getId() == id){
+                user = other;
+                cout << "Contact has been updated: " << id << endl;
+                return;
+            }
+        }
+        cout << "Contact with id: " << id << " is not found!" << endl;
+        return;
+    }
+
      //  Function for Serialization
     /*void serialize(const string& filename)
     {
@@ -145,9 +178,11 @@ public:
         return obj;
     }
     */
-    
+
     string getName(){return name;};
     string getPhone(){return phone;};
+    void setName(string name){this->name = name;};
+    void setPhone(string phone){this->phone = phone;};
     int getLoginState(){return loginState;};
     void setLoginState(int state){ loginState = state;};
     static int getId(){return sequenceCounter;};

@@ -1,11 +1,31 @@
 #include <iostream>
+#include <regex>
 #include "user.h"
 
 using namespace std;
 
 enum PrimaryPrompt{LOGIN, REGISTER, EXIT, MAIN_PROMPT};
 enum subUserPrompt{USER_VERIFICATION, LOGIN_MENU};
-enum featurePrompt{WHOAMI, LIST_CONTACT, ADD_CONTACT, LOGOUT, LOGIN_MENU_PROMPT};
+enum featurePrompt{WHOAMI, LIST_CONTACT, ADD_CONTACT, SEEK_CONTACT, LOGOUT, LOGIN_MENU_PROMPT};
+
+void editPrompt(User &other, int id){
+    cout << "Do you want to edit contact with id: " << id << " ? (y/n): ";
+    char choice;
+    cin >> choice;
+    if(choice == 'n' || choice == 'N') return ;
+    cout << endl;
+    //proceed to edit
+    string name, phone;
+    cout << "Enter updated name: "; cin >> name;
+    cout << "Enter updated phone: "; cin >> phone;
+
+    other.setName(name);
+    other.setPhone(phone);
+
+    //assume the contact is found
+    cout << "Contact has been updated: " << id << endl;
+    return;
+}
 
 int main() {
     PrimaryPrompt prompt = MAIN_PROMPT;
@@ -93,7 +113,8 @@ int main() {
                                 cout << "1. WHO AM I" << endl;
                                 cout << "2. List contact" << endl;
                                 cout << "3. Add contact" << endl;
-                                cout << "4. Logout" << endl;
+                                cout << "4. Seek contact" << endl;
+                                cout << "5. Logout" << endl;
                                 cin >> choice;
                                 login_menu_prompt = static_cast<featurePrompt>(choice - 1);
                                 //cout << "promptId: " << login_menu_prompt << endl;
@@ -112,8 +133,25 @@ int main() {
                                 user.addContactPrompt();
                                 login_menu_prompt = LOGIN_MENU_PROMPT;
                                 break;
+                            case SEEK_CONTACT:{
+                                string phone;
+                                cout << "Please enter phone number to search: ";
+                                cin >> phone;
+                                bool isExist = user.checkUserExist(phone);
+                                if(isExist){
+                                    User foundUser = user.seekContact(phone);
+                                    cout << "Contact found: " << foundUser.getId() << ", " << foundUser.getName() << endl;
+                                    editPrompt(foundUser, foundUser.getId());
+                                    //update the contact on vector
+                                    user.updateContact(foundUser.getId(), foundUser);
+                                } else {
+                                    cout << "Contact with phone number " << phone << " is not found." << endl;
+                                }
+                                cout << endl;
+                                login_menu_prompt = LOGIN_MENU_PROMPT;
+                                break;
+                            }
                             case LOGOUT:
-                                
                                 //have to seek the user from the user list and update the login state
                                 for(auto &u: users){
                                 if((u.getName() == user.getName()) & (user.getPhone() == u.getPhone()))
