@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -8,34 +9,61 @@ class User{
 private:
     string name;
     string phone;
-    int loginState; //0 = out, 1= login
-    static inline int id;
+    int loginState;
+    int id; //0 = out, 1= login
+    static inline int sequenceCounter;
     vector<User> contact;
 
 public:
     User(){
-        id = 0;
+        sequenceCounter = 100;
+        contact = vector<User>();
     }
 
     User(int id, string name, string phone): name(name), phone(phone) {
-        User::id = id;
-        loginState = 1;
+        this->id = id;
+        loginState = 0;
+        contact = vector<User>();
     }
 
     User(string name, string phone): name(name), phone(phone) {
-        id++;
-        loginState = 1;
+        this->id = sequenceCounter;
+        sequenceCounter++;
+        loginState = 0;
         contact = vector<User>();
     }
 
     void addContactPrompt(){
         string name, phone;
-        cout << "Add new contact name: ";
-        cin >> name;
-        cout << "Add " << name << " phone: ";
-        cin >> phone;
+        bool isFail = false;
+        while(true){
+            cout << "Add new contact name: ";
+            cin >> name;
+            cout << "Add " << name << " phone: ";
+            cin >> phone;
+            //check phone number duplicate
+            isFail = checkExistingContact(phone);
+            if(isFail){
+                char choice;
+                cout << "Do you want to Repeat adding contact?, (y/n (will exit) ): ";
+                cin >> choice;
+                if(choice == 'y' || choice == 'Y') return;
+                else continue;
+            }
+            break;
+        }
         addContact(User(name, phone));
         cout << endl;
+    }
+
+    bool checkExistingContact(string phone){
+        for(auto user: contact){
+            if(user.getPhone() == phone){
+                cout << "Phone number already exists, use different one!" << endl;
+                return true;
+            }
+        }
+        return false;
     }
 
     bool addContact(User user){
@@ -59,17 +87,53 @@ public:
             return;
         }
         for(auto user: contact){
-            cout << i << ". " << user.name << ", " << user.phone << endl;
+            cout << i << ", " << user.id << ". " << user.name << ", " << user.phone << endl;
         }
         cout << endl;
+    }
+
+     //  Function for Serialization
+    void serialize(const string& filename)
+    {
+        ofstream file(filename, ios::binary);
+        if (!file.is_open()) {
+            cerr
+                << "Error: Failed to open file for writing."
+                << endl;
+            return;
+        }
+        file.write(reinterpret_cast<const char*>(this),
+                   sizeof(*this));
+        file.close();
+        cout << "Object serialized successfully." << endl;
+    }
+
+    //  Function for Deserialization
+    static User deserialize(const string& filename)
+    {
+        User obj("", 0);
+        obj.setLoginState(0);
+        obj.contact = vector<User>();
+        ifstream file(filename, ios::binary);
+        if (!file.is_open()) {
+            cerr
+                << "Error: Failed to open file for reading."
+                << endl;
+            return obj;
+        }
+        file.read(reinterpret_cast<char*>(&obj),
+                  sizeof(obj));
+        file.close();
+        cout << "Object deserialized successfully." << endl;
+        return obj;
     }
 
     string getName(){return name;};
     string getPhone(){return phone;};
     int getLoginState(){return loginState;};
     void setLoginState(int state){ loginState = state;};
-    static int getId(){return id;};
+    static int getId(){return sequenceCounter;};
     static void resetId(){
-        id = 0;
+        sequenceCounter = 100;
     }
 };

@@ -4,14 +4,14 @@
 using namespace std;
 
 enum PrimaryPrompt{LOGIN, REGISTER, EXIT, MAIN_PROMPT};
-enum subLoginPrompt{USER_VERIFICATION, LOGIN_MENU};
-enum loginMenuPrompt{WHOAMI, LIST_CONTACT, ADD_CONTACT, LOGOUT, LOGIN_MENU_PROMPT};
+enum subUserPrompt{USER_VERIFICATION, LOGIN_MENU};
+enum featurePrompt{WHOAMI, LIST_CONTACT, ADD_CONTACT, LOGOUT, LOGIN_MENU_PROMPT};
 
 int main() {
     PrimaryPrompt prompt = MAIN_PROMPT;
-    subLoginPrompt sub_login_prompt = USER_VERIFICATION;
-    loginMenuPrompt login_menu_prompt = LOGIN_MENU_PROMPT;
-
+    subUserPrompt sub_login_prompt = USER_VERIFICATION;
+    featurePrompt login_menu_prompt = LOGIN_MENU_PROMPT;
+    const string serialname = "user_data.bin";
 
     //reset static variables to 0
     User::resetId();
@@ -19,7 +19,11 @@ int main() {
     User user;
     //test case
     user = User("test", "123");
-    while (prompt != EXIT) {
+    user.setLoginState(0);
+    
+    //reload from serialized data
+    //user = User::deserialize(serialname);
+    while (true) {
         switch (prompt) {
             case MAIN_PROMPT:
                 cout << "Select an option: " << endl;
@@ -64,8 +68,8 @@ int main() {
                                 cout << "3. Add contact" << endl;
                                 cout << "4. Logout" << endl;
                                 cin >> choice;
-                                login_menu_prompt = static_cast<loginMenuPrompt>(choice - 1);
-                                cout << "promptId: " << login_menu_prompt << endl;
+                                login_menu_prompt = static_cast<featurePrompt>(choice - 1);
+                                //cout << "promptId: " << login_menu_prompt << endl;
                                 break;
                             case WHOAMI:
                                 cout << "Name: " << user.getName() << endl;
@@ -106,6 +110,7 @@ int main() {
                 break;
             }
             case EXIT:
+                user.serialize(serialname);
                 return 1;
         }
     }
