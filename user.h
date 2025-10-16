@@ -42,7 +42,7 @@ public:
             contact.push_back(user);
             cout << user.name << " is successfully created" << endl;
         }
-            
+
         else{
             return false;
             cout << "fail to add new contact!" << endl;
@@ -53,9 +53,14 @@ public:
     void printContact(){
         int i = 1;
         cout << "Contact List" << endl;
+        if(contact.size() == 0){
+            cout << "No contact found!" << endl;
+            return;
+        }
         for(auto user: contact){
             cout << i << ". " << user.name << ", " << user.phone << endl;
         }
+        cout << endl;
     }
 
     string getName(){return name;};
