@@ -43,7 +43,7 @@ int main() {
                             sub_login_prompt = LOGIN_MENU;
                             user.setLoginState(1);
                         } else{
-                            cout << "login id not recognized!" << endl;
+                            cout << "entered info is not recognized!" << endl;
                         }
                         break;
                     }
@@ -54,6 +54,7 @@ int main() {
                                 if(user.getLoginState()==0){
                                     //ask for login
                                     sub_login_prompt = USER_VERIFICATION;
+                                    break;
                                 }
 
                                 //TODO: Must check user login state
@@ -70,6 +71,7 @@ int main() {
                                 cout << "Name: " << user.getName() << endl;
                                 cout << "Phone: " << user.getPhone() << endl;
                                 login_menu_prompt = LOGIN_MENU_PROMPT;
+                                cout << endl;
                                 break;
                             case LIST_CONTACT:
                                 user.printContact();
@@ -99,6 +101,8 @@ int main() {
                 //after register set the state to LOGIN for the other menu
                 prompt = LOGIN;
                 sub_login_prompt = LOGIN_MENU;
+                user.setLoginState(0);
+                cout << "Registration is successful, please login to continue" << endl;
                 break;
             }
             case EXIT:

@@ -35,6 +35,7 @@ public:
         cout << "Add " << name << " phone: ";
         cin >> phone;
         addContact(User(name, phone));
+        cout << endl;
     }
 
     bool addContact(User user){
