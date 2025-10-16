@@ -2,17 +2,57 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
 
 using namespace std;
 
 class User{
 private:
+    friend class boost::serialization::access; // Required by Boost
+
     string name;
     string phone;
     int loginState;
     int id; //0 = out, 1= login
     static inline int sequenceCounter;
     vector<User> contact;
+
+     // The core serialization function
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        // Simply list all members to be serialized
+        ar & name;
+        ar & phone;
+        ar & loginState;
+        ar & id;
+        ar & contact;
+    }
+
+    bool checkExistingContact(string phone){
+        for(auto user: contact){
+            if(user.getPhone() == phone){
+                cout << "Phone number already exists, use different one!" << endl;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool addContact(User user){
+        if(user.getId()!=0){
+            contact.push_back(user);
+            cout << user.name << " is successfully created" << endl;
+        }
+
+        else{
+            return false;
+            cout << "fail to add new contact!" << endl;
+        }
+        return true;
+    }
 
 public:
     User(){
@@ -56,29 +96,6 @@ public:
         cout << endl;
     }
 
-    bool checkExistingContact(string phone){
-        for(auto user: contact){
-            if(user.getPhone() == phone){
-                cout << "Phone number already exists, use different one!" << endl;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool addContact(User user){
-        if(user.getId()!=0){
-            contact.push_back(user);
-            cout << user.name << " is successfully created" << endl;
-        }
-
-        else{
-            return false;
-            cout << "fail to add new contact!" << endl;
-        }
-        return true;
-    }
-
     void printContact(){
         int i = 1;
         cout << "Contact List" << endl;
@@ -93,7 +110,7 @@ public:
     }
 
      //  Function for Serialization
-    void serialize(const string& filename)
+    /*void serialize(const string& filename)
     {
         ofstream file(filename, ios::binary);
         if (!file.is_open()) {
@@ -106,7 +123,7 @@ public:
                    sizeof(*this));
         file.close();
         cout << "Object serialized successfully." << endl;
-    }
+    } 
 
     //  Function for Deserialization
     static User deserialize(const string& filename)
@@ -127,7 +144,8 @@ public:
         cout << "Object deserialized successfully." << endl;
         return obj;
     }
-
+    */
+    
     string getName(){return name;};
     string getPhone(){return phone;};
     int getLoginState(){return loginState;};

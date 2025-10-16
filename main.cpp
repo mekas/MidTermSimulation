@@ -16,11 +16,13 @@ int main() {
     //reset static variables to 0
     User::resetId();
 
+    vector<User> users;
+    //create a default user for testing
     User user;
     //test case
     user = User("test", "123");
-    user.setLoginState(0);
-    
+    users.push_back(user);
+
     //reload from serialized data
     //user = User::deserialize(serialname);
     while (true) {
@@ -43,6 +45,30 @@ int main() {
                         cout << "Please enter name and phone number for Login." << endl;
                         cout << "Name: "; cin >> name;
                         cout << "Phone: "; cin >> phone;
+                        // refactor this block by searching the user from the user list
+                        bool isFound = false;
+                        for(auto u: users){
+                            if((u.getName() == name) & (phone == u.getPhone())){
+                                user = u;
+                                isFound = true;
+                                break;
+                            }
+                        }
+
+                        if(!isFound){
+                            cout << "entered info is not recognized!" << endl;
+                            prompt = MAIN_PROMPT;
+                            sub_login_prompt = USER_VERIFICATION;
+                        } else {
+                            sub_login_prompt = LOGIN_MENU;
+                            user.setLoginState(1);
+                            cout << "Login successful!" << endl;
+                            sub_login_prompt = LOGIN_MENU;
+                            prompt = LOGIN;
+                        }
+                        break;
+                        //check the entered data
+                        /*
                         if ((user.getName() == name) & (phone == user.getPhone())){
                             sub_login_prompt = LOGIN_MENU;
                             user.setLoginState(1);
@@ -50,6 +76,7 @@ int main() {
                             cout << "entered info is not recognized!" << endl;
                         }
                         break;
+                        */
                     }
                     case LOGIN_MENU:{
                         //check login state
@@ -102,15 +129,17 @@ int main() {
                 cout << "Name: "; cin >> name;
                 cout << "Phone: "; cin >> phone;
                 user = User(name, phone);
+                //add to user list
+                users.push_back(user);
+
                 //after register set the state to LOGIN for the other menu
                 prompt = LOGIN;
                 sub_login_prompt = LOGIN_MENU;
-                user.setLoginState(0);
                 cout << "Registration is successful, please login to continue" << endl;
                 break;
             }
             case EXIT:
-                user.serialize(serialname);
+                //user.serialize(serialname);
                 return 1;
         }
     }
