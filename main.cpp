@@ -113,9 +113,18 @@ int main() {
                                 login_menu_prompt = LOGIN_MENU_PROMPT;
                                 break;
                             case LOGOUT:
+                                
+                                //have to seek the user from the user list and update the login state
+                                for(auto &u: users){
+                                if((u.getName() == user.getName()) & (user.getPhone() == u.getPhone()))
+                                    u.setLoginState(0);
+                                }
+
                                 prompt = MAIN_PROMPT;
                                 sub_login_prompt = USER_VERIFICATION;
-                                user.setLoginState(0);
+                                login_menu_prompt = LOGIN_MENU_PROMPT;
+
+                                cout << "You have been logged out!" << endl;
                                 break;
                         }
                     }
